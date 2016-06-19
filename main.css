@@ -1,0 +1,44 @@
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  font-size: 14px;
+}
+
+#app {
+  display: flex;
+}
+
+#original, #simplify, #mixed {
+  margin: 20px;
+}
+
+.mixed {
+  display: flex;
+  align-items: center;
+}
+
+.mixed > .fraction {
+  padding: 20px;
+  padding-left: 0;
+}
+
+.whole {
+  padding: 5px;
+}
+
+.fraction {
+  display: inline-block;
+  padding: 20px;
+  text-align: center;
+}
+
+.fraction > div {
+  padding: 5px;
+}
+
+.numerator {
+  border-bottom: 1px solid black;
+}
