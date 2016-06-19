@@ -11,7 +11,7 @@ h1 {
 
 }
 
-#simplify, #add {
+#simplify, #add, #sub {
   display: flex;
 }
 

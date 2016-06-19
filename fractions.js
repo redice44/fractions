@@ -60,7 +60,7 @@ function displayOriginalFraction(dom, fraction) {
 function displayMixedFraction(dom, fraction) {
   var inner = '<h1>Mixed Fraction</h1>';
 
-  if (fraction[0] > 0) {  
+  if (fraction[0] !== 0) {  
     inner += '<div class="mixed"><div class="whole">' + fraction[0] + '</div>';
   }
 
@@ -73,7 +73,7 @@ function displayMixedFraction(dom, fraction) {
 
 function _mixedFraction(fraction) {
   return [Math.floor(fraction[NUMERATOR] / fraction[DENOMINATOR]), 
-          fraction[NUMERATOR] % fraction[DENOMINATOR],
+          Math.abs(fraction[NUMERATOR]) % Math.abs(fraction[DENOMINATOR]),
           fraction[DENOMINATOR]];
 }
 
@@ -99,6 +99,17 @@ function displayAdditionFormula(dom, formula) {
   dom.html(html);
 }
 
+function displaySubtractionFormula(dom, formula) {
+  var html = '<h1>Subtraction</h1><div class="formula">';
+
+  html += _displayFractions(formula[0]);
+  html += _displayOperator('-');
+  html += _displayFractions(formula[1]) + '</div>';
+
+  dom.html(html);
+}
+
+
 function _solveAddition(formula) {
   // Same denominator
   if (formula[0][DENOMINATOR] === formula[1][DENOMINATOR]) {
@@ -109,12 +120,23 @@ function _solveAddition(formula) {
           formula[0][DENOMINATOR] * formula[1][DENOMINATOR]];
 }
 
-$(document).ready(function() {
-  console.log('Ready');
+function _solveSubtraction(formula) {
+  // Same denominator
+  if (formula[0][DENOMINATOR] === formula[1][DENOMINATOR]) {
+    return [formula[0][NUMERATOR] - formula[1][NUMERATOR], formula[0][DENOMINATOR]];
+  }
+  return [formula[0][NUMERATOR] * formula[1][DENOMINATOR] -
+          formula[1][NUMERATOR] * formula[0][DENOMINATOR],
+          formula[0][DENOMINATOR] * formula[1][DENOMINATOR]];
+}
 
-  var originalDom = $('#simplify-original');
-  var simplifyDom = $('#simplify-simplify');
-  var mixedDom = $('#simplify-mixed');
+$(document).ready(function() {
+  var simplify = {    
+    originalDom: $('#simplify-original'),
+    simplifyDom: $('#simplify-simplify'),
+    mixedDom: $('#simplify-mixed'),
+    fraction: newFractions()
+  };
 
   var addition = {
     originalDom: $('#add-original'),
@@ -126,23 +148,32 @@ $(document).ready(function() {
     ]
   };
 
-  var fraction = newFractions();
-  displayOriginalFraction(originalDom, fraction);
+  var subtraction = {
+    originalDom: $('#sub-original'),
+    simplifyDom: $('#sub-simplify'),
+    mixedDom: $('#sub-mixed'),
+    formula: [
+      newFractions(),
+      newFractions()
+    ]
+  };
 
+  displayOriginalFraction(simplify.originalDom, simplify.fraction);
   displayAdditionFormula(addition.originalDom, addition.formula);
+  displaySubtractionFormula(subtraction.originalDom, subtraction.formula);
 
   $('#simplify-more').on('click', function() {
-    fraction = newFractions();
-    displayOriginalFraction(originalDom, fraction);
-    _clearDom(simplifyDom);
-    _clearDom(mixedDom);
+    simplify.fraction = newFractions();
+    displayOriginalFraction(simplify.originalDom, simplify.fraction);
+    _clearDom(simplify.simplifyDom);
+    _clearDom(simplify.mixedDom);
   });
 
   $('#simplify-solve').on('click', function() {
-    var simplifiedFraction = _reduce(fraction);
+    var simplifiedFraction = _reduce(simplify.fraction);
 
-    displayReducedFraction(simplifyDom, simplifiedFraction);
-    displayMixedFraction(mixedDom, _mixedFraction(simplifiedFraction));
+    displayReducedFraction(simplify.simplifyDom, simplifiedFraction);
+    displayMixedFraction(simplify.mixedDom, _mixedFraction(simplifiedFraction));
   });
 
   $('#add-more').on('click', function() {
@@ -162,5 +193,24 @@ $(document).ready(function() {
 
     displayReducedFraction(addition.simplifyDom, simplifiedFraction);
     displayMixedFraction(addition.mixedDom, _mixedFraction(simplifiedFraction));
-  })
+  });
+
+  $('#sub-more').on('click', function() {
+    subtraction.formula = [
+      newFractions(),
+      newFractions()
+    ];
+
+      _clearDom(subtraction.simplifyDom);
+      _clearDom(subtraction.mixedDom);
+    displaySubtractionFormula(subtraction.originalDom, subtraction.formula);
+  });
+
+  $('#sub-solve').on('click', function() {
+    var solution = _solveSubtraction(subtraction.formula);
+    var simplifiedFraction = _reduce(solution);
+
+    displayReducedFraction(subtraction.simplifyDom, simplifiedFraction);
+    displayMixedFraction(subtraction.mixedDom, _mixedFraction(simplifiedFraction));
+  });
 });
