@@ -8,10 +8,14 @@ h1 {
 }
 
 #app {
+
+}
+
+#simplify, #add {
   display: flex;
 }
 
-#original, #simplify, #mixed {
+#simplify-original, #simplify-simplify, #simplify-mixed {
   margin: 20px;
 }
 
@@ -27,6 +31,11 @@ h1 {
 
 .whole {
   padding: 5px;
+}
+
+.formula {
+  display: flex;
+  align-items: center;
 }
 
 .fraction {
